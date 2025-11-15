@@ -1,10 +1,8 @@
 use crate::config::Config;
+use crate::fetch::fetch_entries;
 use log::{debug, error, info, warn};
-use reqwest;
-use reqwest::blocking::Response;
 use std::collections::HashMap;
 use std::error::Error;
-use std::fmt;
 use std::process::exit;
 use std::thread::sleep;
 use std::time::Duration;
@@ -12,35 +10,6 @@ use std::time::Duration;
 use crate::json::{read_from_json, write_to_json};
 use crate::telegram::send_message;
 use crate::types::common::{Entry, EntryId, ResponseData};
-
-#[derive(Debug)]
-pub enum FetchError {
-    Reqwest(reqwest::Error),
-    SerdeJson(serde_json::Error),
-}
-
-impl fmt::Display for FetchError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            FetchError::Reqwest(e) => write!(f, "Reqwest error: {}", e),
-            FetchError::SerdeJson(e) => write!(f, "Serde JSON error: {}", e),
-        }
-    }
-}
-
-impl Error for FetchError {}
-
-impl From<reqwest::Error> for FetchError {
-    fn from(err: reqwest::Error) -> Self {
-        FetchError::Reqwest(err)
-    }
-}
-
-impl From<serde_json::Error> for FetchError {
-    fn from(err: serde_json::Error) -> Self {
-        FetchError::SerdeJson(err)
-    }
-}
 
 const TELEGRAM_REQUEST_THROTTLE_SECONDS: Duration = Duration::from_secs(1);
 
@@ -134,16 +103,6 @@ pub fn read_previous_data<E: Entry>(config: &Config) -> Result<Vec<E>, Box<dyn E
     let previous_data: Vec<E> = serde_json::from_str(&raw_data)?;
 
     Ok(previous_data)
-}
-
-pub fn fetch_entries<Res: ResponseData>(config: &Config) -> Result<Vec<Res::Entry>, FetchError> {
-    let response: Response = reqwest::blocking::get(config.data_endpoint_url)?;
-
-    let successful_response = response.error_for_status()?;
-
-    let data: Res = successful_response.json::<Res>()?;
-
-    Ok(data.entries())
 }
 
 pub fn find_differences<'a, E: Entry>(
