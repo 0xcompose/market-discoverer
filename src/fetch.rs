@@ -36,12 +36,12 @@ impl From<serde_json::Error> for FetchError {
     }
 }
 
-pub fn fetch_entries<Res: ResponseData>(config: &Config) -> Result<Vec<Res::Entry>, FetchError> {
+pub fn fetch_entries<T: ResponseData>(config: &Config) -> Result<Vec<T::Entry>, FetchError> {
     let response: Response = reqwest::blocking::get(&config.data_endpoint_url)?;
 
     let successful_response = response.error_for_status()?;
 
-    let data: Res = successful_response.json::<Res>()?;
+    let data: T = successful_response.json::<T>()?;
 
     Ok(data.entries())
 }

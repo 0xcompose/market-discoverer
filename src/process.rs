@@ -13,10 +13,10 @@ use crate::types::common::{Entry, EntryId, ResponseData};
 
 const TELEGRAM_REQUEST_THROTTLE_SECONDS: Duration = Duration::from_secs(1);
 
-pub fn update_known_entries<Res: ResponseData>(config: Config) {
+pub fn update_known_entries<T: ResponseData>(config: Config) {
     info!("Starting {} update notifier bot", config.name);
 
-    let read_result = read_previous_data::<Res::Entry>(&config);
+    let read_result = read_previous_data::<T::Entry>(&config);
 
     let previous_data = match read_result {
         Ok(data) => data,
@@ -31,7 +31,7 @@ pub fn update_known_entries<Res: ResponseData>(config: Config) {
 
     info!("Fetching entries from {}", config.name);
 
-    let result = fetch_entries::<Res>(&config);
+    let result = fetch_entries::<T>(&config);
 
     let fetched_entries = match result {
         Ok(entries) => entries,
