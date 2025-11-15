@@ -1,0 +1,3 @@
+name = "Stargate Chains"
+data_endpoint_url = "https://stargate.finance/api/v1/chains"
+cache_file_path = "cache/stargate_chains.json"

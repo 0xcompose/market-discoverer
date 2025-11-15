@@ -1,0 +1,3 @@
+name = "Ethereum List"
+data_endpoint_url = "https://chainid.network/chains.json"
+cache_file_path = "cache/ethereum_lists.json"

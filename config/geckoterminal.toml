@@ -1,0 +1,3 @@
+name = "Geckoterminal Networks"
+data_endpoint_url = "https://api.geckoterminal.com/api/v2/networks?page=1"
+cache_file_path = "cache/geckoterminal_networks.json"
