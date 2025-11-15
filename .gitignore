@@ -1,0 +1,6 @@
+/target
+chains_data.json
+.env
+chains.json
+cache
+.vscode
