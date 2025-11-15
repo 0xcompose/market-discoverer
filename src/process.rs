@@ -1,7 +1,10 @@
 use crate::config::Config;
-use log::{debug, error, info};
+use log::{debug, error, info, warn};
 use reqwest;
+use reqwest::blocking::Response;
 use std::collections::HashMap;
+use std::error::Error;
+use std::fmt;
 use std::process::exit;
 use std::thread::sleep;
 use std::time::Duration;
@@ -10,12 +13,50 @@ use crate::json::{read_from_json, write_to_json};
 use crate::telegram::send_message;
 use crate::types::common::{Entry, EntryId, ResponseData};
 
+#[derive(Debug)]
+pub enum FetchError {
+    Reqwest(reqwest::Error),
+    SerdeJson(serde_json::Error),
+}
+
+impl fmt::Display for FetchError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            FetchError::Reqwest(e) => write!(f, "Reqwest error: {}", e),
+            FetchError::SerdeJson(e) => write!(f, "Serde JSON error: {}", e),
+        }
+    }
+}
+
+impl Error for FetchError {}
+
+impl From<reqwest::Error> for FetchError {
+    fn from(err: reqwest::Error) -> Self {
+        FetchError::Reqwest(err)
+    }
+}
+
+impl From<serde_json::Error> for FetchError {
+    fn from(err: serde_json::Error) -> Self {
+        FetchError::SerdeJson(err)
+    }
+}
+
 const TELEGRAM_REQUEST_THROTTLE_SECONDS: Duration = Duration::from_secs(1);
 
 pub fn update_known_entries<Res: ResponseData>(config: Config) {
     info!("Starting {} update notifier bot", config.name);
 
-    let previous_data = read_previous_data::<Res>(&config);
+    let read_result = read_previous_data::<Res::Entry>(&config);
+
+    let previous_data = match read_result {
+        Ok(data) => data,
+        Err(e) => {
+            warn!("Failed to read previous data: {}", e);
+            info!("Initializing storage");
+            vec![]
+        }
+    };
 
     info!("Total known entries: {}", previous_data.len());
 
@@ -27,7 +68,8 @@ pub fn update_known_entries<Res: ResponseData>(config: Config) {
         Ok(entries) => entries,
         Err(e) => {
             error!("Failed to fetch entries: {}", e);
-            exit(1);
+            warn!("Exiting program");
+            return;
         }
     };
 
@@ -86,54 +128,22 @@ pub fn update_known_entries<Res: ResponseData>(config: Config) {
     }
 }
 
-pub fn read_previous_data<Res: ResponseData>(config: &Config) -> Vec<Res::Entry> {
-    let raw_data: String = match read_from_json(&config.cache_file_path) {
-        Ok(data) => data,
-        Err(e) => {
-            error!("Failed to read stored data: {}", e);
-            return vec![];
-        }
-    };
+pub fn read_previous_data<E: Entry>(config: &Config) -> Result<Vec<E>, Box<dyn Error>> {
+    let raw_data: String = read_from_json(&config.cache_file_path)?;
 
-    let previous_data: Vec<Res::Entry> = match serde_json::from_str(&raw_data) {
-        Ok(data) => data,
-        Err(e) => {
-            error!("Failed to parse JSON: {}", e);
-            vec![]
-        }
-    };
+    let previous_data: Vec<E> = serde_json::from_str(&raw_data)?;
 
-    previous_data
+    Ok(previous_data)
 }
 
-pub fn fetch_entries<Res: ResponseData>(
-    config: &Config,
-) -> Result<Vec<Res::Entry>, Box<dyn std::error::Error>> {
-    let response: Res = match reqwest::blocking::get(config.data_endpoint_url) {
-        Ok(resp) => {
-            let validated_response = resp.error_for_status();
+pub fn fetch_entries<Res: ResponseData>(config: &Config) -> Result<Vec<Res::Entry>, FetchError> {
+    let response: Response = reqwest::blocking::get(config.data_endpoint_url)?;
 
-            match validated_response {
-                Ok(response) => match response.json::<Res>() {
-                    Ok(data) => data,
-                    Err(e) => {
-                        error!("Failed to parse JSON response: {}", e);
-                        return Err(e.into());
-                    }
-                },
-                Err(e) => {
-                    error!("HTTP error: {}", e);
-                    return Err(e.into());
-                }
-            }
-        }
-        Err(e) => {
-            error!("Failed to fetch data: {}", e);
-            return Err(e.into());
-        }
-    };
+    let successful_response = response.error_for_status()?;
 
-    Ok(response.entries())
+    let data: Res = successful_response.json::<Res>()?;
+
+    Ok(data.entries())
 }
 
 pub fn find_differences<'a, E: Entry>(
