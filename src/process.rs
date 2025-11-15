@@ -91,7 +91,7 @@ pub fn update_known_entries<Res: ResponseData>(config: Config) {
     process_changes(&config, removed_entries, "❌ *Entry Removed*");
 
     // Save to JSON file
-    match write_to_json(&fetched_entries, config.cache_file_path) {
+    match write_to_json(&fetched_entries, &config.cache_file_path) {
         Ok(_) => info!("Data saved to {}", config.cache_file_path),
         Err(e) => error!("Failed to save data to JSON: {}", e),
     }
