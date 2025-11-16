@@ -2,6 +2,8 @@
 
 A Rust application that monitors blockchain network data from various APIs and sends notifications via Telegram when changes are detected.
 
+This project can be used to track changes in JSON arrays, for my case, I'm using it for discovering appearing blockchains.
+
 ## Features
 
 -   Monitors multiple blockchain network data sources (Ethereum List, Geckoterminal, Stargate Chains)
@@ -145,22 +147,6 @@ To add a new data source:
 3. Create a config file in `config/`
 4. Update the main binary to use the new type
 
-## Troubleshooting
-
-### "TG_BOT_TOKEN is not set"
-
-Ensure your `.env` file exists and contains the required Telegram credentials.
-
-### "Failed to fetch entries"
-
--   Check your internet connection
--   Verify the API endpoint URL in the config file
--   Check if the API response structure matches the expected format
-
-### "Failed to read previous data"
-
-This is normal on the first run. The application will initialize the cache automatically.
-
 ## License
 
-[Add your license here]
+MIT, bruv
