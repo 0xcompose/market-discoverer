@@ -2,7 +2,7 @@ use std::env;
 
 use log::{error, info};
 use market_discoverer::config::read_config;
-use market_discoverer::types::ethereum_list::types::EthereumListResponseData;
+use market_discoverer::service::Service;
 
 fn main() {
     env_logger::init();
@@ -22,5 +22,13 @@ fn main() {
 
     info!("config: {:?}", config);
 
-    market_discoverer::process::update_known_entries::<EthereumListResponseData>(config.clone());
+    let service = Service::from_config_name(&config.name);
+
+    match service {
+        Some(service) => service.process(config.clone()),
+        None => {
+            error!("Invalid service name: {}", config.name);
+            return;
+        }
+    }
 }
