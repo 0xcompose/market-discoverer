@@ -1,6 +1,6 @@
 use crate::config::Config;
-use crate::fetch::fetch_entries;
 use log::{debug, error, info, warn};
+use reqwest::blocking::Response;
 use std::collections::HashMap;
 use std::error::Error;
 use std::process::exit;
@@ -103,6 +103,16 @@ pub fn read_previous_data<E: Entry>(config: &Config) -> Result<Vec<E>, Box<dyn E
     let previous_data: Vec<E> = serde_json::from_str(&raw_data)?;
 
     Ok(previous_data)
+}
+
+pub fn fetch_entries<T: ResponseData>(config: &Config) -> Result<Vec<T::Entry>, reqwest::Error> {
+    let response: Response = reqwest::blocking::get(&config.data_endpoint_url)?;
+
+    let successful_response = response.error_for_status()?;
+
+    let data: T = successful_response.json::<T>()?;
+
+    Ok(data.entries())
 }
 
 pub fn find_differences<'a, E: Entry>(
