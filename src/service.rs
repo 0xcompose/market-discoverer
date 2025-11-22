@@ -1,11 +1,11 @@
 use crate::{
-    config::Config,
-    process::update_known_entries,
-    types::{
+    clients::{
         ethereum_list::types::EthereumListResponseData,
         geckoterminal::types::GeckoterminalNetworksData,
         stargate_api::types::StargateChainsResponseData,
     },
+    config::Config,
+    process::update_known_entries,
 };
 
 #[derive(Debug, Clone, Copy)]

@@ -1,5 +1,5 @@
-use crate::types::common::{Entry, EntryId, ResponseData};
-use crate::types::stargate_api::types::{Chain, StargateChainsResponseData};
+use crate::clients::common::{Entry, EntryId, ResponseData};
+use crate::clients::stargate_api::types::{Chain, StargateChainsResponseData};
 
 impl ResponseData for StargateChainsResponseData {
     type Entry = Chain;

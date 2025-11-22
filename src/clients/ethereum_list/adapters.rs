@@ -1,5 +1,5 @@
-use crate::types::common::{Entry, EntryId, ResponseData};
-use crate::types::ethereum_list::types::{Chain, EthereumListResponseData};
+use crate::clients::common::{Entry, EntryId, ResponseData};
+use crate::clients::ethereum_list::types::{Chain, EthereumListResponseData};
 
 impl ResponseData for EthereumListResponseData {
     type Entry = Chain;

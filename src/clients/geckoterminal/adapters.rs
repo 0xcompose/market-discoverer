@@ -1,5 +1,5 @@
-use crate::types::common::{Entry, EntryId, ResponseData};
-use crate::types::geckoterminal::types::{GeckoterminalNetworksData, Network};
+use crate::clients::common::{Entry, EntryId, ResponseData};
+use crate::clients::geckoterminal::types::{GeckoterminalNetworksData, Network};
 
 impl ResponseData for GeckoterminalNetworksData {
     type Entry = Network;

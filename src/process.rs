@@ -7,9 +7,9 @@ use std::process::exit;
 use std::thread::sleep;
 use std::time::Duration;
 
+use crate::clients::common::{Entry, EntryId, ResponseData};
 use crate::json::{read_from_json, write_to_json};
 use crate::telegram::send_message;
-use crate::types::common::{Entry, EntryId, ResponseData};
 
 const TELEGRAM_REQUEST_THROTTLE_SECONDS: Duration = Duration::from_secs(1);
 
