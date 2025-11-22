@@ -1,13 +1,14 @@
 use crate::config::Config;
+use crate::diff::find_differences;
+use crate::notification::notify_on_change;
 use log::{debug, error, info, warn};
 use reqwest::blocking::Response;
-use std::collections::HashMap;
 use std::error::Error;
 use std::process::exit;
 use std::thread::sleep;
 use std::time::Duration;
 
-use crate::clients::common::{Entry, EntryId, ResponseData};
+use crate::clients::common::{Entry, ResponseData};
 use crate::json::{read_from_json, write_to_json};
 use crate::telegram::send_message;
 
@@ -115,35 +116,6 @@ pub fn fetch_entries<T: ResponseData>(config: &Config) -> Result<Vec<T::Entry>, 
     Ok(data.entries())
 }
 
-pub fn find_differences<'a, E: Entry>(
-    previous_data: &'a Vec<E>,
-    fetched_entries: &'a Vec<E>,
-) -> (Vec<&'a E>, Vec<&'a E>) {
-    let previously_known_entries: HashMap<EntryId, &E> = previous_data
-        .iter()
-        .map(|entry| (entry.id(), entry))
-        .collect();
-
-    let new_entries: HashMap<EntryId, &E> = fetched_entries
-        .iter()
-        .map(|entry| (entry.id(), entry))
-        .collect();
-
-    let added_entries: Vec<&E> = new_entries
-        .iter()
-        .filter(|entry| !previously_known_entries.contains_key(entry.0))
-        .map(|entry| entry.1.to_owned())
-        .collect();
-
-    let removed_entries: Vec<&E> = previously_known_entries
-        .iter()
-        .filter(|entry| !new_entries.contains_key(entry.0))
-        .map(|entry| entry.1.to_owned())
-        .collect();
-
-    (added_entries, removed_entries)
-}
-
 pub fn process_changes<E: Entry>(config: &Config, changed_entries: Vec<&E>, msg_header: &str) {
     for changed_entry in changed_entries {
         sleep(TELEGRAM_REQUEST_THROTTLE_SECONDS);
@@ -160,25 +132,4 @@ pub fn process_changes<E: Entry>(config: &Config, changed_entries: Vec<&E>, msg_
             exit(1);
         }
     }
-}
-
-pub fn notify_on_change<T: Entry>(
-    config: &Config,
-    entry: &T,
-    msg_header: &str,
-) -> Result<(), Box<dyn std::error::Error>> {
-    info!(
-        "Notifying on change for entry: {} ({})",
-        entry.name(),
-        entry.id()
-    );
-
-    let message = format!("⚙️ {}\n\n{}\n\n{}", config.name, msg_header, entry.format());
-
-    if let Err(e) = send_message(&message) {
-        error!("Failed to send Telegram notification: {}", e);
-        return Err(e);
-    }
-
-    Ok(())
 }
