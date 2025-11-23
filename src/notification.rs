@@ -1,6 +1,6 @@
 use log::{error, info};
 
-use crate::{clients::common::Entry, config::Config, telegram::send_message};
+use crate::{config::Config, services::traits::Entry, telegram::send_message};
 
 pub fn notify_on_change<T: Entry>(
     config: &Config,

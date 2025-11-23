@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::clients::common::{Entry, EntryId};
+use crate::services::traits::{Entry, EntryId};
 
 pub fn find_differences<'a, E: Entry>(
     previous_data: &'a Vec<E>,
