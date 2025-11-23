@@ -3,6 +3,9 @@ use std::env;
 use log::{error, info};
 use market_discoverer::config::read_config;
 use market_discoverer::service::Service;
+use market_discoverer::services::ethereum_list::service::EthereumList;
+use market_discoverer::services::geckoterminal::service::Geckoterminal;
+use market_discoverer::services::stargate_api::service::StargateAPI;
 
 fn main() {
     env_logger::init();
@@ -22,13 +25,13 @@ fn main() {
 
     info!("config: {:?}", config);
 
-    let service = Service::from_config_name(&config.name);
-
-    match service {
-        Some(service) => service.process(config.clone()),
-        None => {
+    match &*config.name {
+        "Ethereum List" => EthereumList.process(config),
+        "Stargate Chains" => StargateAPI.process(config),
+        "Geckoterminal Networks" => Geckoterminal.process(config),
+        _ => {
             error!("Invalid service name: {}", config.name);
             return;
         }
-    }
+    };
 }
