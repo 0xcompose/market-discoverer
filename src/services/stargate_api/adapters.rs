@@ -1,17 +1,17 @@
-use crate::clients::common::{Entry, EntryId, ResponseData};
-use crate::clients::ethereum_list::types::{Chain, EthereumListResponseData};
+use crate::services::stargate_api::types::{Chain, StargateChainsResponseData};
+use crate::services::traits::{Entry, EntryId, ResponseData};
 
-impl ResponseData for EthereumListResponseData {
+impl ResponseData for StargateChainsResponseData {
     type Entry = Chain;
 
     fn entries(&self) -> Vec<Self::Entry> {
-        self.clone()
+        self.chains.clone()
     }
 }
 
 impl Entry for Chain {
     fn id(&self) -> EntryId {
-        self.chain_id.to_string()
+        self.chain_key.clone()
     }
 
     fn name(&self) -> String {

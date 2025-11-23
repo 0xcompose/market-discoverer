@@ -49,7 +49,7 @@ pub struct Links {
 
     pub prev: Option<serde_json::Value>,
 
-    pub next: String,
+    pub next: Option<serde_json::Value>,
 
     pub last: String,
 }
