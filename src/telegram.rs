@@ -1,6 +1,10 @@
+use std::time::Duration;
+
 use log::{debug, error, info};
 use reqwest;
 use serde_json::json;
+
+pub const TELEGRAM_REQUEST_THROTTLE_SECONDS: Duration = Duration::from_secs(1);
 
 pub fn mock_send_message(message: &str) -> Result<(), Box<dyn std::error::Error>> {
     info!("Mocking message: {}", message);
