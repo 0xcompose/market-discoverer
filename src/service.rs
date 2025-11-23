@@ -148,16 +148,4 @@ pub trait Service {
             Err(e) => Err(e),
         }
     }
-
-    // fn name(&self) -> String;
-    // fn data_endpoint_url(&self) -> String;
-    // fn cache_file_path(&self) -> String;
-    // fn telegram_chat_id(&self) -> String;
-    // fn telegram_bot_token(&self) -> String;
-    // fn telegram_bot_name(&self) -> String;
-    // fn telegram_bot_username(&self) -> String;
-    // fn telegram_bot_password(&self) -> String;
-    // fn telegram_bot_port(&self) -> String;
-    // fn telegram_bot_host(&self) -> String;
-    // fn telegram_bot_protocol(&self) -> String;
 }
