@@ -800,18 +800,6 @@
 		}
 	},
 	{
-		"id": "monad",
-		"chain_identifier": null,
-		"name": "Monad",
-		"shortname": "",
-		"native_coin_id": "monad",
-		"image": {
-			"thumb": "https://coin-images.coingecko.com/asset_platforms/images/22182/thumb/monad.png?1729046263",
-			"small": "https://coin-images.coingecko.com/asset_platforms/images/22182/small/monad.png?1729046263",
-			"large": "https://coin-images.coingecko.com/asset_platforms/images/22182/large/monad.png?1729046263"
-		}
-	},
-	{
 		"id": "dmex",
 		"chain_identifier": null,
 		"name": "DMEX",
@@ -1528,6 +1516,18 @@
 		}
 	},
 	{
+		"id": "carnomaly",
+		"chain_identifier": 7667,
+		"name": "CarrChain",
+		"shortname": "",
+		"native_coin_id": "carnomaly",
+		"image": {
+			"thumb": "https://coin-images.coingecko.com/asset_platforms/images/32269/thumb/Carnomaly.jpg?1763957650",
+			"small": "https://coin-images.coingecko.com/asset_platforms/images/32269/small/Carnomaly.jpg?1763957650",
+			"large": "https://coin-images.coingecko.com/asset_platforms/images/32269/large/Carnomaly.jpg?1763957650"
+		}
+	},
+	{
 		"id": "humanode",
 		"chain_identifier": 5234,
 		"name": "Humanode",
@@ -1697,6 +1697,18 @@
 			"thumb": "https://coin-images.coingecko.com/asset_platforms/images/29/thumb/bitcichain.png?1706606405",
 			"small": "https://coin-images.coingecko.com/asset_platforms/images/29/small/bitcichain.png?1706606405",
 			"large": "https://coin-images.coingecko.com/asset_platforms/images/29/large/bitcichain.png?1706606405"
+		}
+	},
+	{
+		"id": "monad",
+		"chain_identifier": 143,
+		"name": "Monad",
+		"shortname": "",
+		"native_coin_id": "monad",
+		"image": {
+			"thumb": "https://coin-images.coingecko.com/asset_platforms/images/22182/thumb/monad.png?1729046263",
+			"small": "https://coin-images.coingecko.com/asset_platforms/images/22182/small/monad.png?1729046263",
+			"large": "https://coin-images.coingecko.com/asset_platforms/images/22182/large/monad.png?1729046263"
 		}
 	},
 	{
