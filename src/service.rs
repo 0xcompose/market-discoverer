@@ -123,7 +123,7 @@ pub trait Service {
         for changed_entry in changed_entries {
             sleep(TELEGRAM_REQUEST_THROTTLE_SECONDS);
 
-            let result = notify_on_change::<Self::Entry>(&config, changed_entry, msg_header);
+            let result = notify_on_change(&config, changed_entry, msg_header);
 
             if let Err(e) = result {
                 error!(
@@ -147,5 +147,23 @@ pub trait Service {
             }
             Err(e) => Err(e),
         }
+    }
+
+    fn notify_on_change<T: Entry>(
+        config: &Config,
+        entry: &T,
+        msg_header: &str,
+    ) -> Result<(), reqwest::Error> {
+        info!(
+            "Notifying on change for entry: {} ({})",
+            entry.name(),
+            entry.id()
+        );
+
+        let message: String = format!("⚙️ {}\n\n{}\n\n{}", config.name, msg_header, entry.format());
+
+        send_message(&message)?;
+
+        Ok(())
     }
 }
