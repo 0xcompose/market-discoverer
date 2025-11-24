@@ -6,6 +6,7 @@ use market_discoverer::service::Service;
 use market_discoverer::services::coingecko::service::Coingecko;
 use market_discoverer::services::ethereum_list::service::EthereumList;
 use market_discoverer::services::geckoterminal::service::Geckoterminal;
+use market_discoverer::services::layerzero::service::LayerZero;
 use market_discoverer::services::stargate_api::service::StargateAPI;
 
 fn main() {
@@ -31,6 +32,7 @@ fn main() {
         "Stargate Chains" => StargateAPI.process(config),
         "Geckoterminal Networks" => Geckoterminal.process(config),
         "Coingecko Asset Platforms" => Coingecko.process(config),
+        "LayerZero Networks" => LayerZero.process(config),
         _ => {
             error!("Invalid service name: {}", config.name);
             return;

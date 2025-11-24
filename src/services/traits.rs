@@ -3,7 +3,7 @@ use std::fmt::Debug;
 
 pub type EntryId = String;
 
-pub trait Entry: Serialize + DeserializeOwned + Debug {
+pub trait Entry: Serialize + DeserializeOwned + Debug + Clone {
     fn id(&self) -> EntryId;
 
     fn name(&self) -> String;
