@@ -3,6 +3,7 @@ use std::env;
 use log::{error, info};
 use market_discoverer::config::read_config;
 use market_discoverer::service::Service;
+use market_discoverer::services::coingecko::service::Coingecko;
 use market_discoverer::services::ethereum_list::service::EthereumList;
 use market_discoverer::services::geckoterminal::service::Geckoterminal;
 use market_discoverer::services::stargate_api::service::StargateAPI;
@@ -29,6 +30,7 @@ fn main() {
         "Ethereum List" => EthereumList.process(config),
         "Stargate Chains" => StargateAPI.process(config),
         "Geckoterminal Networks" => Geckoterminal.process(config),
+        "Coingecko Asset Platforms" => Coingecko.process(config),
         _ => {
             error!("Invalid service name: {}", config.name);
             return;
