@@ -6,7 +6,6 @@ use crate::{
     config::Config,
     diff::find_differences,
     json::{read_from_json, write_to_json},
-    notification::notify_on_change,
     services::traits::{Entry, ResponseData},
     telegram::{TELEGRAM_REQUEST_THROTTLE_SECONDS, send_message},
 };
@@ -48,7 +47,9 @@ pub trait Service {
             }
         };
 
-        fetched_entries.iter().for_each(|entry| {
+        let filtered_entries = Self::filter_entries(&fetched_entries);
+
+        filtered_entries.iter().for_each(|entry| {
             debug!("Fetched entry: {} ({})", entry.name(), entry.id());
         });
 
@@ -56,14 +57,14 @@ pub trait Service {
             let msg = format!(
                 "{} is just initialized with {} entries",
                 config.name,
-                fetched_entries.len()
+                filtered_entries.len()
             );
 
             if let Err(e) = send_message(&msg) {
                 error!("Failed to send Telegram message: {}", e);
             }
 
-            write_to_json(&fetched_entries, config.cache_file_path).unwrap();
+            write_to_json(&filtered_entries, config.cache_file_path).unwrap();
 
             return;
         }
@@ -71,11 +72,11 @@ pub trait Service {
         info!(
             "Total entries from {} API: {}",
             config.name,
-            fetched_entries.len()
+            filtered_entries.len()
         );
 
         // Find differences between previous_data and response comparing by chain_id
-        let (added_entries, removed_entries) = find_differences(&previous_data, &fetched_entries);
+        let (added_entries, removed_entries) = find_differences(&previous_data, &filtered_entries);
 
         if added_entries.is_empty() && removed_entries.is_empty() {
             info!("No changes in entries of {} detected", config.name);
@@ -97,7 +98,7 @@ pub trait Service {
         self.process_changes(&config, removed_entries, "❌ *Entry Removed*");
 
         // Save to JSON file
-        match write_to_json(&fetched_entries, &config.cache_file_path) {
+        match write_to_json(&filtered_entries, &config.cache_file_path) {
             Ok(_) => info!("Data saved to {}", config.cache_file_path),
             Err(e) => error!("Failed to save data to JSON: {}", e),
         }
@@ -123,7 +124,7 @@ pub trait Service {
         for changed_entry in changed_entries {
             sleep(TELEGRAM_REQUEST_THROTTLE_SECONDS);
 
-            let result = notify_on_change(&config, changed_entry, msg_header);
+            let result = Self::notify_on_change(&config, changed_entry, msg_header);
 
             if let Err(e) = result {
                 error!(
@@ -149,9 +150,9 @@ pub trait Service {
         }
     }
 
-    fn notify_on_change<T: Entry>(
+    fn notify_on_change(
         config: &Config,
-        entry: &T,
+        entry: &Self::Entry,
         msg_header: &str,
     ) -> Result<(), reqwest::Error> {
         info!(
@@ -165,5 +166,9 @@ pub trait Service {
         send_message(&message)?;
 
         Ok(())
+    }
+
+    fn filter_entries(entries: &[Self::Entry]) -> Vec<Self::Entry> {
+        entries.to_vec()
     }
 }
