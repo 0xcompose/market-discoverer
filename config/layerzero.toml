@@ -1,0 +1,3 @@
+name = "LayerZero Networks"
+data_endpoint_url = "https://metadata.layerzero-api.com/v1/metadata/deployments"
+cache_file_path = "cache/layerzero_networks.json"
