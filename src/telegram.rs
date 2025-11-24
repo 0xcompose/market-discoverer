@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use log::{debug, error, info};
+use log::{debug, info};
 use reqwest;
 use serde_json::json;
 
