@@ -1,5 +1,6 @@
 use crate::services::coingecko::types::{CoingeckoAssetPlatform, CoingeckoAssetPlatforms};
 use crate::services::traits::{Entry, EntryId, ResponseData};
+use crate::utils::opt_display;
 
 impl ResponseData for CoingeckoAssetPlatforms {
     type Entry = CoingeckoAssetPlatform;
@@ -15,7 +16,7 @@ impl Entry for CoingeckoAssetPlatform {
     }
 
     fn name(&self) -> String {
-        self.name.clone()
+        opt_display(&self.name, "N/A")
     }
 
     fn format(&self) -> String {
@@ -23,9 +24,9 @@ impl Entry for CoingeckoAssetPlatform {
             "📛 Name: {}\n\
              🔗 Chain ID: {}\n\
              💰 Native Coin: {}",
-            self.name,
-            self.chain_identifier.unwrap_or_default(),
-            self.native_coin_id
+            opt_display(&self.name, "N/A"),
+            opt_display(&self.chain_identifier, "N/A"),
+            opt_display(&self.native_coin_id, "N/A")
         )
     }
 }

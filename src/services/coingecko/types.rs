@@ -21,20 +21,20 @@ pub struct CoingeckoAssetPlatform {
 
     pub chain_identifier: Option<i64>,
 
-    pub name: String,
+    pub name: Option<String>,
 
-    pub shortname: String,
+    pub shortname: Option<String>,
 
-    pub native_coin_id: String,
+    pub native_coin_id: Option<String>,
 
-    pub image: Image,
+    pub image: Option<Image>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Image {
-    pub thumb: Option<String>,
+    pub thumb: Option<serde_json::Value>,
 
-    pub small: Option<String>,
+    pub small: Option<serde_json::Value>,
 
-    pub large: Option<String>,
+    pub large: Option<serde_json::Value>,
 }
