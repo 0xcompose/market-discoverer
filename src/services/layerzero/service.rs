@@ -1,5 +1,4 @@
 use crate::{
-    config::Config,
     service::Service,
     services::{
         layerzero::types::{
@@ -17,18 +16,22 @@ impl Service for LayerZero {
     type Entry = LayerZeroNetworkMetadata;
     type ResponseData = LayerZeroNetworksMetadata;
 
-    fn fetch_entries(
-        &self,
-        config: &Config,
-    ) -> Result<Vec<LayerZeroNetworkMetadata>, reqwest::Error> {
+    fn get_data_endpoint_url() -> &'static str {
+        "https://metadata.layerzero-api.com/v1/metadata/deployments"
+    }
+
+    fn name() -> &'static str {
+        "LayerZero Networks"
+    }
+
+    fn fetch_entries() -> Result<Vec<LayerZeroNetworkMetadata>, reqwest::Error> {
+        let url = Self::get_data_endpoint_url();
+
         let client = reqwest::blocking::Client::builder()
             .user_agent(USER_AGENT)
             .build()?;
 
-        let response = client
-            .get(&config.data_endpoint_url)
-            .send()?
-            .error_for_status()?;
+        let response = client.get(url).send()?.error_for_status()?;
 
         let data: LayerZeroNetworksMetadata = response.json()?;
 

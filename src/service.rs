@@ -1,6 +1,7 @@
 use std::{process::exit, thread::sleep};
 
 use log::{debug, error, info, warn};
+use reqwest::Url;
 
 use crate::{
     config::Config,
@@ -13,10 +14,6 @@ use crate::{
 pub trait Service {
     type Entry: Entry;
     type ResponseData: ResponseData<Entry = Self::Entry>;
-
-    fn process(&self, config: Config) {
-        self.update_known_entries(config);
-    }
 
     fn update_known_entries(&self, config: Config) {
         info!("Starting {} update notifier bot", config.name);
@@ -33,7 +30,7 @@ pub trait Service {
 
         info!("Fetching entries from {}", config.name);
 
-        let result = self.fetch_entries(&config);
+        let result = Self::fetch_entries();
 
         let fetched_entries = match result {
             Ok(entries) => entries,
@@ -147,8 +144,11 @@ pub trait Service {
         }
     }
 
-    fn fetch_entries(&self, config: &Config) -> Result<Vec<Self::Entry>, reqwest::Error> {
-        let response = reqwest::blocking::get(&config.data_endpoint_url)?.error_for_status();
+    fn fetch_entries() -> Result<Vec<Self::Entry>, reqwest::Error> {
+        let url = Url::parse(Self::get_data_endpoint_url())
+            .expect(&format!("Invalid URL for service {}", Self::name()));
+
+        let response = reqwest::blocking::get(url)?.error_for_status();
 
         match response {
             Ok(response) => {
@@ -180,4 +180,8 @@ pub trait Service {
     fn filter_entries(entries: &[Self::Entry]) -> Vec<Self::Entry> {
         entries.to_vec()
     }
+
+    fn get_data_endpoint_url() -> &'static str;
+
+    fn name() -> &'static str;
 }

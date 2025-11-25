@@ -1,7 +1,7 @@
 use log::debug;
+use reqwest::Url;
 
 use crate::{
-    config::Config,
     service::Service,
     services::{
         geckoterminal::types::{GeckoterminalNetworksData, Network},
@@ -15,10 +15,23 @@ impl Service for Geckoterminal {
     type Entry = Network;
     type ResponseData = GeckoterminalNetworksData;
 
+    fn get_data_endpoint_url() -> &'static str {
+        "https://api.geckoterminal.com/api/v2/networks"
+    }
+
+    fn name() -> &'static str {
+        "Geckoterminal Networks"
+    }
+
     // Fetches Networks from Geckoterminal API iterating through all pages
-    fn fetch_entries(&self, config: &Config) -> Result<Vec<Network>, reqwest::Error> {
+    fn fetch_entries() -> Result<Vec<Network>, reqwest::Error> {
+        let mut base_url = Url::parse(Self::get_data_endpoint_url())
+            .expect(&format!("Invalid URL for service {}", Self::name()));
+
+        base_url.set_query(Some("page=1"));
+
         let mut entries = Vec::new();
-        let mut next_page_url: Option<String> = Some(config.data_endpoint_url.clone());
+        let mut next_page_url: Option<String> = Some(base_url.to_string());
 
         while let Some(url) = next_page_url {
             debug!("Fetching entries from {}", url);

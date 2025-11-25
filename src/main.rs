@@ -28,11 +28,11 @@ fn main() {
     info!("config: {:?}", config);
 
     match &*config.name {
-        "Ethereum List" => EthereumList.process(config),
-        "Stargate Chains" => StargateAPI.process(config),
-        "Geckoterminal Networks" => Geckoterminal.process(config),
-        "Coingecko Asset Platforms" => Coingecko.process(config),
-        "LayerZero Networks" => LayerZero.process(config),
+        "Ethereum List" => EthereumList.update_known_entries(config),
+        "Stargate Chains" => StargateAPI.update_known_entries(config),
+        "Geckoterminal Networks" => Geckoterminal.update_known_entries(config),
+        "Coingecko Asset Platforms" => Coingecko.update_known_entries(config),
+        "LayerZero Networks" => LayerZero.update_known_entries(config),
         _ => {
             error!("Invalid service name: {}", config.name);
             return;

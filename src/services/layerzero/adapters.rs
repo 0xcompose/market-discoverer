@@ -1,27 +1,10 @@
-use log::debug;
-
-use crate::services::{
-    layerzero::types::{LayerZeroNetworkMetadata, LayerZeroNetworksMetadata},
-    traits::{Entry, EntryId, ResponseData},
+use crate::{
+    services::{
+        layerzero::types::{LayerZeroNetworkMetadata, LayerZeroNetworksMetadata},
+        traits::{Entry, EntryId, ResponseData},
+    },
+    utils::{opt_debug, opt_display},
 };
-
-fn opt_display<T>(opt: &Option<T>, default: &str) -> String
-where
-    T: std::fmt::Display,
-{
-    opt.as_ref()
-        .map(|v| v.to_string())
-        .unwrap_or_else(|| default.to_string())
-}
-
-fn opt_debug<T>(opt: &Option<T>, default: &str) -> String
-where
-    T: std::fmt::Debug,
-{
-    opt.as_ref()
-        .map(|v: &T| format!("{:?}", v))
-        .unwrap_or_else(|| default.to_string())
-}
 
 impl ResponseData for LayerZeroNetworksMetadata {
     type Entry = LayerZeroNetworkMetadata;

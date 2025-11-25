@@ -1,5 +1,4 @@
 use crate::{
-    config::Config,
     service::Service,
     services::coingecko::types::{CoingeckoAssetPlatform, CoingeckoAssetPlatforms},
     services::traits::ResponseData,
@@ -8,15 +7,21 @@ use crate::{
 pub struct Coingecko;
 
 const API_KEY_HEADER: &str = "X-CG-Pro-API-Key";
+const ASSET_PLATFORM_ENDPOINT_URL: &str = "https://api.coingecko.com/api/v3/asset_platforms";
 
 impl Service for Coingecko {
     type Entry = CoingeckoAssetPlatform;
     type ResponseData = CoingeckoAssetPlatforms;
 
-    fn fetch_entries(
-        &self,
-        config: &Config,
-    ) -> Result<Vec<CoingeckoAssetPlatform>, reqwest::Error> {
+    fn get_data_endpoint_url() -> &'static str {
+        ASSET_PLATFORM_ENDPOINT_URL
+    }
+
+    fn name() -> &'static str {
+        "Coingecko Asset Platforms"
+    }
+
+    fn fetch_entries() -> Result<Vec<CoingeckoAssetPlatform>, reqwest::Error> {
         dotenv::dotenv().ok();
 
         // Retrieve Coingecko API key from environment variable
@@ -25,7 +30,7 @@ impl Service for Coingecko {
         let client = reqwest::blocking::Client::new();
 
         let response = client
-            .get(&config.data_endpoint_url)
+            .get(ASSET_PLATFORM_ENDPOINT_URL)
             .header(API_KEY_HEADER, api_key)
             .send()?
             .error_for_status()?;

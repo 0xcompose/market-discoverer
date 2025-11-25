@@ -9,7 +9,6 @@ use toml;
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
     pub name: String,
-    pub data_endpoint_url: String,
     pub cache_file_path: String,
 }
 
