@@ -6,7 +6,7 @@ use crate::{
     config::Config,
     diff::find_differences,
     json::{read_from_json, write_to_json},
-    services::traits::{Entry, ResponseData},
+    services::traits::{Entry, EntryId, ResponseData},
     telegram::{TELEGRAM_REQUEST_THROTTLE_SECONDS, send_message},
 };
 
@@ -21,18 +21,15 @@ pub trait Service {
     fn update_known_entries(&self, config: Config) {
         info!("Starting {} update notifier bot", config.name);
 
-        let read_result = self.read_previous_data(&config);
+        let read_result = Self::get_known_entries(&config);
 
-        let previous_data = match read_result {
-            Ok(data) => data,
-            Err(e) => {
-                warn!("Failed to read previous data: {}", e);
-                info!("Initializing storage");
-                vec![]
-            }
-        };
+        let known_entries = read_result.unwrap_or_else(|e| {
+            warn!("Failed to get known entries: {:?}", e);
+            info!("Initializing known entries storage");
+            vec![]
+        });
 
-        info!("Total known entries: {}", previous_data.len());
+        info!("Total known entries: {}", known_entries.len());
 
         info!("Fetching entries from {}", config.name);
 
@@ -47,24 +44,24 @@ pub trait Service {
             }
         };
 
-        let filtered_entries = Self::filter_entries(&fetched_entries);
+        let filtered_new_entries = Self::filter_entries(&fetched_entries);
 
-        filtered_entries.iter().for_each(|entry| {
+        filtered_new_entries.iter().for_each(|entry| {
             debug!("Fetched entry: {} ({})", entry.name(), entry.id());
         });
 
-        if previous_data.is_empty() {
+        if known_entries.is_empty() {
             let msg = format!(
                 "{} is just initialized with {} entries",
                 config.name,
-                filtered_entries.len()
+                filtered_new_entries.len()
             );
 
             if let Err(e) = send_message(&msg) {
                 error!("Failed to send Telegram message: {}", e);
             }
 
-            write_to_json(&filtered_entries, config.cache_file_path).unwrap();
+            write_to_json(&filtered_new_entries, config.cache_file_path).unwrap();
 
             return;
         }
@@ -72,11 +69,12 @@ pub trait Service {
         info!(
             "Total entries from {} API: {}",
             config.name,
-            filtered_entries.len()
+            filtered_new_entries.len()
         );
 
         // Find differences between previous_data and response comparing by chain_id
-        let (added_entries, removed_entries) = find_differences(&previous_data, &filtered_entries);
+        let (added_entries, removed_entries) =
+            find_differences(&known_entries, &filtered_new_entries);
 
         if added_entries.is_empty() && removed_entries.is_empty() {
             info!("No changes in entries of {} detected", config.name);
@@ -98,21 +96,32 @@ pub trait Service {
         self.process_changes(&config, removed_entries, "❌ *Entry Removed*");
 
         // Save to JSON file
-        match write_to_json(&filtered_entries, &config.cache_file_path) {
+        match write_to_json(&filtered_new_entries, &config.cache_file_path) {
             Ok(_) => info!("Data saved to {}", config.cache_file_path),
             Err(e) => error!("Failed to save data to JSON: {}", e),
         }
     }
 
-    fn read_previous_data(
-        &self,
-        config: &Config,
-    ) -> Result<Vec<Self::Entry>, Box<dyn std::error::Error>> {
+    fn get_known_entries(config: &Config) -> Result<Vec<Self::Entry>, Box<dyn std::error::Error>> {
         let raw_data: String = read_from_json(&config.cache_file_path)?;
 
-        let previous_data: Vec<Self::Entry> = serde_json::from_str(&raw_data)?;
+        let known_entries: Vec<Self::Entry> = serde_json::from_str(&raw_data)?;
 
-        Ok(previous_data)
+        Ok(known_entries)
+    }
+
+    fn find_entry_with_id(
+        config: &Config,
+        id: &EntryId,
+    ) -> Result<Option<Self::Entry>, Box<dyn std::error::Error>> {
+        let known_entries = Self::get_known_entries(config)?;
+
+        let entry = known_entries
+            .iter()
+            .find(|entry| entry.id() == *id)
+            .cloned();
+
+        Ok(entry)
     }
 
     fn process_changes(
