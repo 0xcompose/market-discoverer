@@ -23,7 +23,7 @@ pub struct StargateChainsResponseData {
 pub struct Chain {
     pub chain_key: String,
 
-    pub chain_type: ChainType,
+    pub chain_type: String,
 
     pub chain_id: i64,
 
@@ -32,24 +32,6 @@ pub struct Chain {
     pub name: String,
 
     pub native_currency: NativeCurrency,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ChainType {
-    Aptos,
-
-    Evm,
-
-    Hypercore,
-
-    Solana,
-
-    Sui,
-
-    Ton,
-
-    Tron,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
