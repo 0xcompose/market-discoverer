@@ -1,16 +1,3 @@
-// Example code that deserializes and serializes the model.
-// extern crate serde;
-// #[macro_use]
-// extern crate serde_derive;
-// extern crate serde_json;
-//
-// use generated_module::EthereumListResponseData;
-//
-// fn main() {
-//     let json = r#"{"answer": 42}"#;
-//     let model: EthereumListResponseData = serde_json::from_str(&json).unwrap();
-// }
-
 use serde::{Deserialize, Serialize};
 
 pub type EthereumListResponseData = Vec<Chain>;
@@ -83,46 +70,7 @@ pub enum Standard {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Feature {
-    pub name: Name,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum Name {
-    #[serde(rename = "Custom Gas Model")]
-    CustomGasModel,
-
-    #[serde(rename = "Directed Acyclic Graph (DAG)")]
-    DirectedAcyclicGraphDag,
-
-    #[serde(rename = "EIP1108")]
-    Eip1108,
-
-    #[serde(rename = "EIP155")]
-    Eip155,
-
-    #[serde(rename = "EIP1559")]
-    Eip1559,
-
-    #[serde(rename = "EIP20")]
-    Eip20,
-
-    #[serde(rename = "EIP55")]
-    Eip55,
-
-    #[serde(rename = "EIP6551")]
-    Eip6551,
-
-    #[serde(rename = "Low-Latency Transactions")]
-    LowLatencyTransactions,
-
-    #[serde(rename = "none")]
-    None,
-
-    #[serde(rename = "Smart Contracts")]
-    SmartContracts,
-
-    #[serde(rename = "Unspent Transaction Output (UTXO)")]
-    UnspentTransactionOutputUtxo,
+    pub name: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
