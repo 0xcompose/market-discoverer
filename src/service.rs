@@ -35,7 +35,7 @@ pub trait Service {
         let fetched_entries = match result {
             Ok(entries) => entries,
             Err(e) => {
-                error!("Failed to fetch entries: {}", e);
+                error!("Failed to fetch entries: {:?}", e);
                 warn!("Exiting program");
                 return;
             }
