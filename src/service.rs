@@ -30,7 +30,7 @@ pub trait Service {
 
         info!("Fetching entries from {}", config.name);
 
-        let result = Self::fetch_entries();
+        let result = Self::fetch_entries(&config);
 
         let fetched_entries = match result {
             Ok(entries) => entries,
@@ -144,9 +144,17 @@ pub trait Service {
         }
     }
 
-    fn fetch_entries() -> Result<Vec<Self::Entry>, reqwest::Error> {
-        let url = Url::parse(Self::get_data_endpoint_url())
-            .expect(&format!("Invalid URL for service {}", Self::name()));
+    fn fetch_entries(config: &Config) -> Result<Vec<Self::Entry>, reqwest::Error> {
+        let url: Url;
+
+        if let Some(data_url) = &config.data_url {
+            url = Url::parse(data_url).expect(&format!(
+                "Provided invalid URL for service {}",
+                Self::name()
+            ));
+        } else {
+            url = Self::get_default_data_endpoint_url()
+        }
 
         let response = reqwest::blocking::get(url)?.error_for_status();
 
@@ -181,7 +189,7 @@ pub trait Service {
         entries.to_vec()
     }
 
-    fn get_data_endpoint_url() -> &'static str;
+    fn get_default_data_endpoint_url() -> Url;
 
     fn name() -> &'static str;
 }

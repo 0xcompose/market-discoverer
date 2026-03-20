@@ -1,4 +1,7 @@
+use reqwest::Url;
+
 use crate::{
+    config::Config,
     service::Service,
     services::{
         layerzero::types::{
@@ -16,22 +19,32 @@ impl Service for LayerZero {
     type Entry = LayerZeroNetworkMetadata;
     type ResponseData = LayerZeroNetworksMetadata;
 
-    fn get_data_endpoint_url() -> &'static str {
-        "https://metadata.layerzero-api.com/v1/metadata/deployments"
+    fn get_default_data_endpoint_url() -> Url {
+        Url::parse("https://metadata.layerzero-api.com/v1/metadata/deployments")
+            .expect("Invalid default URL for service LayerZero Networks")
     }
 
     fn name() -> &'static str {
         "LayerZero Networks"
     }
 
-    fn fetch_entries() -> Result<Vec<LayerZeroNetworkMetadata>, reqwest::Error> {
-        let url = Self::get_data_endpoint_url();
+    fn fetch_entries(config: &Config) -> Result<Vec<LayerZeroNetworkMetadata>, reqwest::Error> {
+        let data_url: Url;
+
+        if let Some(provided_data_url) = &config.data_url {
+            data_url = Url::parse(provided_data_url).expect(&format!(
+                "Provided invalid URL for service {}",
+                Self::name()
+            ));
+        } else {
+            data_url = Self::get_default_data_endpoint_url()
+        }
 
         let client = reqwest::blocking::Client::builder()
             .user_agent(USER_AGENT)
             .build()?;
 
-        let response = client.get(url).send()?.error_for_status()?;
+        let response = client.get(data_url).send()?.error_for_status()?;
 
         let data: LayerZeroNetworksMetadata = response.json()?;
 

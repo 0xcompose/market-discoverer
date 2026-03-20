@@ -10,6 +10,7 @@ use toml;
 pub struct Config {
     pub name: String,
     pub cache_file_path: String,
+    pub data_url: Option<String>,
 }
 
 #[derive(Debug)]

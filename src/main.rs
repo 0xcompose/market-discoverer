@@ -2,6 +2,7 @@ use std::fmt;
 
 use clap::{Parser, ValueEnum};
 use log::warn;
+use market_discoverer::config::Config;
 use market_discoverer::service::Service;
 use market_discoverer::services::coingecko::service::Coingecko;
 use market_discoverer::services::ethereum_list::service::EthereumList;
@@ -54,6 +55,12 @@ fn main() {
         warn!("Cache file path is not provided, using default path: cache/{service_name}.json");
         return;
     }
+
+    let config = Config {
+        name: service_name,
+        cache_file_path: args.cache_file_path.unwrap(),
+        data_url: args.data_url,
+    };
 
     match args.service_name {
         ServiceName::EthereumList => EthereumList.update_known_entries(config),

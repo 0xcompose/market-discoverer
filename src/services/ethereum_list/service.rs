@@ -1,3 +1,5 @@
+use reqwest::Url;
+
 use crate::{
     service::Service,
     services::ethereum_list::types::{Chain, EthereumListResponseData},
@@ -15,7 +17,8 @@ impl Service for EthereumList {
         "Ethereum List"
     }
 
-    fn get_data_endpoint_url() -> &'static str {
-        ETHEREUM_LIST_ENDPOINT_URL
+    fn get_default_data_endpoint_url() -> Url {
+        Url::parse(ETHEREUM_LIST_ENDPOINT_URL)
+            .expect("Invalid default URL for service Ethereum List")
     }
 }
