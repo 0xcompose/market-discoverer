@@ -14,6 +14,8 @@ pub struct Coingecko;
 const API_KEY_HEADER: &str = "X-CG-Pro-API-Key";
 const ASSET_PLATFORM_ENDPOINT_URL: &str = "https://api.coingecko.com/api/v3/asset_platforms";
 
+const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
 impl Service for Coingecko {
     type Entry = CoingeckoAssetPlatform;
     type ResponseData = CoingeckoAssetPlatforms;
@@ -44,7 +46,9 @@ impl Service for Coingecko {
         // Retrieve Coingecko API key from environment variable
         let api_key = std::env::var("COINGECKO_API_KEY").expect("COINGECKO_API_KEY is not set");
 
-        let client = reqwest::blocking::Client::new();
+        let client = reqwest::blocking::Client::builder()
+            .user_agent(USER_AGENT)
+            .build()?;
 
         let response = client
             .get(data_url)
