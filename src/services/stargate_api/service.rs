@@ -10,7 +10,7 @@ impl Service for StargateAPI {
     type ResponseData = StargateChainsResponseData;
 
     fn get_data_endpoint_url() -> &'static str {
-        "https://stargate.finance/api/v1/chains"
+        "https://transfer.layerzero-api.com/v1/chains"
     }
 
     fn name() -> &'static str {
