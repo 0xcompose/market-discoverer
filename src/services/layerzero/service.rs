@@ -28,29 +28,6 @@ impl Service for LayerZero {
         "LayerZero Networks"
     }
 
-    fn fetch_entries(config: &Config) -> Result<Vec<LayerZeroNetworkMetadata>, reqwest::Error> {
-        let data_url: Url;
-
-        if let Some(provided_data_url) = &config.data_url {
-            data_url = Url::parse(provided_data_url).expect(&format!(
-                "Provided invalid URL for service {}",
-                Self::name()
-            ));
-        } else {
-            data_url = Self::get_default_data_endpoint_url()
-        }
-
-        let client = reqwest::blocking::Client::builder()
-            .user_agent(USER_AGENT)
-            .build()?;
-
-        let response = client.get(data_url).send()?.error_for_status()?;
-
-        let data: LayerZeroNetworksMetadata = response.json()?;
-
-        Ok(data.entries())
-    }
-
     fn filter_entries(entries: &[Self::Entry]) -> Vec<Self::Entry> {
         entries
             .iter()

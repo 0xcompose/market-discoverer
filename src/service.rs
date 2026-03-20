@@ -11,6 +11,8 @@ use crate::{
     telegram::{TELEGRAM_REQUEST_THROTTLE_SECONDS, send_message},
 };
 
+const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
 pub trait Service {
     type Entry: Entry;
     type ResponseData: ResponseData<Entry = Self::Entry>;
@@ -145,26 +147,26 @@ pub trait Service {
     }
 
     fn fetch_entries(config: &Config) -> Result<Vec<Self::Entry>, reqwest::Error> {
-        let url: Url;
+        let data_url: Url;
 
-        if let Some(data_url) = &config.data_url {
-            url = Url::parse(data_url).expect(&format!(
+        if let Some(provided_data_url) = &config.data_url {
+            data_url = Url::parse(provided_data_url).expect(&format!(
                 "Provided invalid URL for service {}",
                 Self::name()
             ));
         } else {
-            url = Self::get_default_data_endpoint_url()
+            data_url = Self::get_default_data_endpoint_url()
         }
 
-        let response = reqwest::blocking::get(url)?.error_for_status();
+        let client = reqwest::blocking::Client::builder()
+            .user_agent(USER_AGENT)
+            .build()?;
 
-        match response {
-            Ok(response) => {
-                let data: Self::ResponseData = response.json()?;
-                Ok(data.entries())
-            }
-            Err(e) => Err(e),
-        }
+        let response = client.get(data_url).send()?.error_for_status()?;
+
+        let data: Self::ResponseData = response.json()?;
+
+        Ok(data.entries())
     }
 
     fn notify_on_change(
