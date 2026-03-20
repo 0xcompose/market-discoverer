@@ -22,7 +22,7 @@ pub struct LayerZeroNetworkMetadata {
 pub struct ChainDetails {
     pub chain_type: String,
 
-    pub chain_key: String,
+    pub chain_key: Option<String>,
 
     #[serde(rename = "chainStatus")]
     pub chain_status: Option<ChainStatus>,
@@ -107,7 +107,6 @@ pub struct Deployment {
     pub eid: Option<String>,
 
     pub chain_key: Option<String>,
-
     pub stage: Option<Stage>,
 
     pub version: Option<i64>,
@@ -122,10 +121,6 @@ pub struct Deployment {
 
     pub relayer_v2: Option<Endpoint>,
 
-    pub f_p_validator: Option<Endpoint>,
-
-    pub treasury_v2: Option<Endpoint>,
-
     pub ultra_light_node: Option<Endpoint>,
 
     pub ultra_light_node_v2: Option<Endpoint>,
@@ -138,42 +133,6 @@ pub struct Deployment {
     pub send_uln302: Option<Endpoint>,
 
     pub receive_uln302: Option<Endpoint>,
-
-    pub nonce_contract: Option<Endpoint>,
-
-    pub executor: Option<Endpoint>,
-
-    pub lz_executor: Option<Endpoint>,
-
-    pub blocked_message_lib: Option<Endpoint>,
-
-    #[serde(rename = "mPTValidator01")]
-    pub m_pt_validator01: Option<Endpoint>,
-
-    #[serde(rename = "mPTValidatorV4")]
-    pub m_pt_validator_v4: Option<Endpoint>,
-
-    #[serde(rename = "mPTValidatorV5")]
-    pub m_pt_validator_v5: Option<Endpoint>,
-
-    #[serde(rename = "deadDVN")]
-    pub dead_dvn: Option<Endpoint>,
-
-    pub controller: Option<Endpoint>,
-
-    pub dvn_proxy: Option<Endpoint>,
-
-    pub uln_manager: Option<Endpoint>,
-
-    pub executor_proxy: Option<Endpoint>,
-
-    pub all_storages: Option<Endpoint>,
-
-    pub sml_manager: Option<Endpoint>,
-
-    pub pricefeed: Option<Endpoint>,
-
-    pub dvn: Option<Endpoint>,
 
     pub read_lib1002: Option<Endpoint>,
 }
